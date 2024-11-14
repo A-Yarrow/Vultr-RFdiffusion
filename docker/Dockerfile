@@ -1,27 +1,10 @@
-# Usage: 
-# git clone https://github.com/RosettaCommons/RFdiffusion.git
-# cd RFdiffusion
-# docker build -f docker/Dockerfile -t rfdiffusion .
-# mkdir $HOME/inputs $HOME/outputs $HOME/models
-# bash scripts/download_models.sh $HOME/models
-# wget -P $HOME/inputs https://files.rcsb.org/view/5TPN.pdb
-
-# docker run -it --rm --gpus all \
-#   -v $HOME/models:$HOME/models \
-#   -v $HOME/inputs:$HOME/inputs \
-#   -v $HOME/outputs:$HOME/outputs \
-#   rfdiffusion \
-#   inference.output_prefix=$HOME/outputs/motifscaffolding \
-#   inference.model_directory_path=$HOME/models \
-#   inference.input_pdb=$HOME/inputs/5TPN.pdb \
-#   inference.num_designs=3 \
-#   'contigmap.contigs=[10-40/A163-181/10-40]'
-
 FROM nvcr.io/nvidia/cuda:11.6.2-cudnn8-runtime-ubuntu20.04
 
-COPY . /root/RFdiffusion/
+# Copy files to /app/RFdiffusion in the container
+COPY . /app/RFdiffusion/
 
-RUN apt-get -q update \ 
+# Install dependencies
+RUN apt-get -q update \
   && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
   git \
   python3.9 \
@@ -29,8 +12,10 @@ RUN apt-get -q update \
   && python3.9 -m pip install -q -U --no-cache-dir pip \
   && rm -rf /var/lib/apt/lists/* \
   && apt-get autoremove -y \
-  && apt-get clean \
-  && pip install -q --no-cache-dir \
+  && apt-get clean
+
+# Install Python packages
+RUN pip install -q --no-cache-dir \
   dgl==1.0.2+cu116 -f https://data.dgl.ai/wheels/cu116/repo.html \
   torch==1.12.1+cu116 --extra-index-url https://download.pytorch.org/whl/cu116 \
   e3nn==0.3.3 \
@@ -40,11 +25,18 @@ RUN apt-get -q update \
   decorator==5.1.0 \
   hydra-core==1.3.2 \
   pyrsistent==0.19.3 \
-  numpy==1.26.4 \
-  pip install -e /root/RFdiffusion/env/SE3Transformer --no-deps && \
-  pip install -e /root/RFdiffusion --no-deps  
+  numpy==1.26.4
+
+# Install SE3Transformer and RFdiffusion packages in editable mode
+RUN pip install -e /app/RFdiffusion/env/SE3Transformer --no-deps
+RUN pip install -e /app/RFdiffusion --no-deps  
+
+# Set the working directory to /root/RFdiffusion
 WORKDIR /root/RFdiffusion
 
+# Set environment variable
 ENV DGLBACKEND="pytorch"
 
+# Set entrypoint to run the inference script
 ENTRYPOINT ["python3.9", "scripts/run_inference.py"]
+
