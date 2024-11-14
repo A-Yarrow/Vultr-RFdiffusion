@@ -41,9 +41,8 @@ RUN apt-get -q update \
   hydra-core==1.3.2 \
   pyrsistent==0.19.3 \
   numpy==1.26.4 \
-  /root/RFdiffusion/env/SE3Transformer \
-  && pip install --no-cache-dir /root/RFdiffusion --no-deps
-  
+  pip install -e /app/RFdiffusion/env/SE3Transformer --no-deps && \
+  pip install -e /app/RFdiffusion --no-deps  
 WORKDIR /root/RFdiffusion
 
 ENV DGLBACKEND="pytorch"
