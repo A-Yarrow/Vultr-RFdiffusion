@@ -19,7 +19,7 @@
 
 FROM nvcr.io/nvidia/cuda:11.6.2-cudnn8-runtime-ubuntu20.04
 
-COPY . /app/RFdiffusion/
+COPY . /root/RFdiffusion/
 
 RUN apt-get -q update \ 
   && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
@@ -41,8 +41,8 @@ RUN apt-get -q update \
   hydra-core==1.3.2 \
   pyrsistent==0.19.3 \
   numpy==1.26.4 \
-  pip install -e /app/RFdiffusion/env/SE3Transformer --no-deps && \
-  pip install -e /app/RFdiffusion --no-deps  
+  pip install -e /root/RFdiffusion/env/SE3Transformer --no-deps && \
+  pip install -e /root/RFdiffusion --no-deps  
 WORKDIR /root/RFdiffusion
 
 ENV DGLBACKEND="pytorch"
