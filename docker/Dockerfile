@@ -38,5 +38,5 @@ WORKDIR /root/RFdiffusion
 ENV DGLBACKEND="pytorch"
 
 # Set entrypoint to run the inference script
-ENTRYPOINT ["python3.9", "scripts/run_inference.py"]
+ENTRYPOINT ["python3.9", "/root/RFdiffusion/scripts/run_inference.py"]
 
